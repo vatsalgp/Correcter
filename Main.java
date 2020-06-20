@@ -1,6 +1,8 @@
 package correcter;
 
-import correcter.encoding.*;
+import correcter.encoding.bit.*;
+import correcter.encoding.hamming.*;
+import correcter.encoding.character.*;
 
 public class Main {
     public static void main(final String[] args) {
@@ -9,13 +11,13 @@ public class Main {
         else {
             switch (args[0].toLowerCase()) {
                 case "hamming":
-                    Hamming.all();
+                    EncodeHamming.all();
                     break;
                 case "bit":
-                    Bit.all();
+                    EncodeBit.all();
                     break;
                 case "char":
-                    Char.all();
+                    EncodeChar.all();
                     break;
                 default:
                     wrongMode();

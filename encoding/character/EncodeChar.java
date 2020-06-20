@@ -1,9 +1,9 @@
-package correcter.encoding;
+package correcter.encoding.character;
 
 import correcter.io.IOString;
 import java.util.Random;
 
-public class Char {
+public class EncodeChar {
 
     final private static int SIZE = 3;
 

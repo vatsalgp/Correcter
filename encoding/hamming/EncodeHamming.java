@@ -1,9 +1,9 @@
-package correcter.encoding;
+package correcter.encoding.hamming;
 
 import correcter.io.IOByte;
 import java.util.Random;
 
-public class Hamming {
+public class EncodeHamming {
     public static void all() {
         encodeMode();
         sendMode();

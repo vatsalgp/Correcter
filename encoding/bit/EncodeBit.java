@@ -1,9 +1,9 @@
-package correcter.encoding;
+package correcter.encoding.bit;
 
 import correcter.io.IOByte;
 import java.util.Random;
 
-public class Bit {
+public class EncodeBit {
     public static void all() {
         encodeMode();
         sendMode();
