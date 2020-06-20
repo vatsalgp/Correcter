@@ -32,7 +32,7 @@ public class EncodeHamming {
         final byte[] outBytes = new byte[inBytes.length * 2];
         for (int i = 0; i < inBytes.length; i++) {
             for (int j = 0; j < 2; j++) {
-                int[] bits = new int[4];
+                final int[] bits = new int[4];
                 for (int k = 0; k < 4; k++)
                     bits[k] = getBitAt(inBytes[i], j * 4 + k);
                 outBytes[2 * i + j] = encodeByte(bits);
@@ -81,7 +81,7 @@ public class EncodeHamming {
         byte bitCount = 0;
         byte outByte = 0;
         for (final byte inByte : inBytes) {
-            int[] bits = decodeByte(inByte);
+            final int[] bits = decodeByte(inByte);
             for (byte i = 0; i < 4; i++) {
                 outByte = setBitAt(outByte, bitCount, bits[bitCount % 4]);
                 bitCount++;
@@ -95,17 +95,17 @@ public class EncodeHamming {
         return outBytes;
     }
 
-    private static int[] decodeByte(byte inByte) {
-        int p1 = getBitAt(inByte, 1);
-        int p2 = getBitAt(inByte, 2);
-        int p4 = getBitAt(inByte, 4);
+    private static int[] decodeByte(final byte inByte) {
+        final int p1 = getBitAt(inByte, 1);
+        final int p2 = getBitAt(inByte, 2);
+        final int p4 = getBitAt(inByte, 4);
         int a = getBitAt(inByte, 3);
         int b = getBitAt(inByte, 5);
         int c = getBitAt(inByte, 6);
         int d = getBitAt(inByte, 7);
-        boolean c1 = (p1 == (a ^ b ^ d));
-        boolean c2 = (p2 == (a ^ c ^ d));
-        boolean c4 = (p4 == (b ^ c ^ d));
+        final boolean c1 = (p1 == (a ^ b ^ d));
+        final boolean c2 = (p2 == (a ^ c ^ d));
+        final boolean c4 = (p4 == (b ^ c ^ d));
         if (!(c1 && c2 || c2 && c4 || c4 && c1))
             if (c1)
                 c = flipInt(c);
@@ -118,7 +118,7 @@ public class EncodeHamming {
         return new int[] { a, b, c, d };
     }
 
-    private static int flipInt(int x) {
+    private static int flipInt(final int x) {
         return x == 1 ? 0 : 1;
     }
 }

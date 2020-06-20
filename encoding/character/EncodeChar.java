@@ -31,7 +31,7 @@ public class EncodeChar {
         IOString.writeToFile("decoded.txt", decodedString);
     }
 
-    private static String decode(String string) {
+    private static String decode(final String string) {
         final StringBuilder in = new StringBuilder(string);
         final String[] parts = in.toString().split("(?<=\\G.{" + SIZE + "})");
         final StringBuilder out = new StringBuilder();
@@ -44,7 +44,7 @@ public class EncodeChar {
         return out.toString();
     }
 
-    private static String jumble(String string) {
+    private static String jumble(final String string) {
         final StringBuilder in = new StringBuilder(string);
         final Random random = new Random();
         final String[] parts = in.toString().split("(?<=\\G.{" + SIZE + "})");
