@@ -45,37 +45,28 @@ public class Main {
     }
 
     private static byte[] encode(final byte[] inBytes) {
-        final int length = (int) Math.ceil(inBytes.length * 8 / 3.0);
-        final byte[] outBytes = new byte[length];
-        int l = 0;
-        int k = 0;
-        int parity = 0;
-        int count = 0;
-        byte outByte = 0;
-        for (final byte inByte : inBytes) {
-            for (int j = 0; j < 8; j++) {
-                count++;
-                count %= 3;
-                final int bit = getBitAt(inByte, j);
-                parity = parity ^ bit;
-                outByte = setBitAt(outByte, k++, bit);
-                outByte = setBitAt(outByte, k++, bit);
-                if (count == 0) {
-                    outByte = setBitAt(outByte, k++, parity);
-                    outByte = setBitAt(outByte, k++, parity);
-                    outBytes[l++] = outByte;
-                    outByte = 0;
-                    k = 0;
-                    parity = 0;
-                }
+        final byte[] outBytes = new byte[inBytes.length * 2];
+        for (int i = 0; i < inBytes.length; i++) {
+            for (int j = 0; j < 2; j++) {
+                int[] bits = new int[4];
+                for (int k = 0; k < 4; k++)
+                    bits[k] = getBitAt(inBytes[i], j * 4 + k);
+                outBytes[2 * i + j] = encodeByte(bits);
             }
         }
-        if (l != length) {
-            outByte = setBitAt(outByte, 6, parity);
-            outByte = setBitAt(outByte, 7, parity);
-            outBytes[l++] = outByte;
-        }
         return outBytes;
+    }
+
+    private static byte encodeByte(final int[] bits) {
+        byte outByte = 0;
+        outByte = setBitAt(outByte, 1, bits[0] ^ bits[1] ^ bits[3]);
+        outByte = setBitAt(outByte, 2, bits[0] ^ bits[2] ^ bits[3]);
+        outByte = setBitAt(outByte, 3, bits[0]);
+        outByte = setBitAt(outByte, 4, bits[1] ^ bits[2] ^ bits[3]);
+        outByte = setBitAt(outByte, 5, bits[1]);
+        outByte = setBitAt(outByte, 6, bits[2]);
+        outByte = setBitAt(outByte, 7, bits[3]);
+        return outByte;
     }
 
     private static int getBitAt(final byte b, final int pos) {
@@ -101,33 +92,50 @@ public class Main {
     }
 
     private static byte[] decode(final byte[] inBytes) {
-        final byte[] outBytes = new byte[inBytes.length * 3 / 8];
+        final byte[] outBytes = new byte[inBytes.length / 2];
+        int outByteCount = 0;
+        byte bitCount = 0;
         byte outByte = 0;
-        int l = 0;
-        int k = 0;
         for (final byte inByte : inBytes) {
-            int a = getBitAt(inByte, 0);
-            int b = getBitAt(inByte, 2);
-            int c = getBitAt(inByte, 4);
-            final int p = getBitAt(inByte, 6);
-            final int e = (p - a - b - c + 4) % 2;
-            if (a != getBitAt(inByte, 1))
-                a ^= e;
-            else if (b != getBitAt(inByte, 3))
-                b ^= e;
-            else if (c != getBitAt(inByte, 5))
-                c ^= e;
-            final int[] bits = { a, b, c };
-            for (final int bit : bits) {
-                outByte = setBitAt(outByte, k++, bit);
-                if (k == 8) {
-                    k = 0;
-                    outBytes[l++] = outByte;
-                    outByte = 0;
-                }
+            int[] bits = decodeByte(inByte);
+            for (byte i = 0; i < 4; i++) {
+                outByte = setBitAt(outByte, bitCount, bits[bitCount % 4]);
+                bitCount++;
+            }
+            if (bitCount == 8) {
+                outBytes[outByteCount++] = outByte;
+                bitCount = 0;
+                outByte = 0;
             }
         }
         return outBytes;
+    }
+
+    private static int[] decodeByte(byte inByte) {
+        int p1 = getBitAt(inByte, 1);
+        int p2 = getBitAt(inByte, 2);
+        int p4 = getBitAt(inByte, 4);
+        int a = getBitAt(inByte, 3);
+        int b = getBitAt(inByte, 5);
+        int c = getBitAt(inByte, 6);
+        int d = getBitAt(inByte, 7);
+        boolean c1 = (p1 == (a ^ b ^ d));
+        boolean c2 = (p2 == (a ^ c ^ d));
+        boolean c4 = (p4 == (b ^ c ^ d));
+        if (!(c1 && c2 || c2 && c4 || c4 && c1))
+            if (c1)
+                c = flipInt(c);
+            else if (c2)
+                b = flipInt(b);
+            else if (c4)
+                a = flipInt(a);
+            else
+                d = flipInt(d);
+        return new int[] { a, b, c, d };
+    }
+
+    private static int flipInt(int x) {
+        return x == 1 ? 0 : 1;
     }
 
     private static byte[] readFromFile(final String filename) {
